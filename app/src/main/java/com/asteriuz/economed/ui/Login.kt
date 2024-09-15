@@ -59,6 +59,7 @@ fun LoginScreen(
     val scope = rememberCoroutineScope()
     val auth = FirebaseAuth.getInstance()
 
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -137,23 +138,27 @@ fun LoginScreen(
 
         Button(
             onClick = {
-                scope.launch {
-                    auth.signInWithEmailAndPassword(email, password)
-                        .addOnCompleteListener { task ->
-                            if (task.isSuccessful) {
-                                navController.navigate("AppContent") {
-                                    popUpTo("home") {
-                                        inclusive = true
+                if (email.isNotEmpty() && password.isNotEmpty()) {
+                    scope.launch {
+                        auth.signInWithEmailAndPassword(email, password)
+                            .addOnCompleteListener { task ->
+                                if (task.isSuccessful) {
+                                    navController.navigate("AppContent") {
+                                        popUpTo("home") {
+                                            inclusive = true
+                                        }
                                     }
+                                } else {
+                                    Toast.makeText(
+                                        context,
+                                        "Login failed: ${task.exception?.message}",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
                                 }
-                            } else {
-                                Toast.makeText(
-                                    context,
-                                    "Login failed: ${task.exception?.message}",
-                                    Toast.LENGTH_SHORT
-                                ).show()
                             }
-                        }
+                    }
+                } else {
+                    Toast.makeText(context, "Preencha todos os campos", Toast.LENGTH_SHORT).show()
                 }
             },
             modifier = Modifier
